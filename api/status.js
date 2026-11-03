@@ -19,6 +19,15 @@ const SERVICES = [
   ['kraken', 'Kraken', 'https://status.kraken.com', 'crypto'],
   ['solana', 'Solana', 'https://status.solana.com', 'crypto'],
   ['epic', 'Epic Games', 'https://status.epicgames.com', 'games'],
+  ['fastly', 'Fastly', 'https://www.fastlystatus.com', 'infra'],
+  ['akamai', 'Akamai', 'https://www.akamaistatus.com', 'infra'],
+  ['datadog', 'Datadog', 'https://status.datadoghq.com', 'dev'],
+  ['supabase', 'Supabase', 'https://status.supabase.com', 'dev'],
+  ['linear', 'Linear', 'https://linearstatus.com', 'dev'],
+  ['shopify', 'Shopify', 'https://www.shopifystatus.com', 'cloud'],
+  ['twitch', 'Twitch', 'https://status.twitch.com', 'social'],
+  ['bitbucket', 'Bitbucket', 'https://bitbucket.status.atlassian.com', 'dev'],
+  ['sendgrid', 'SendGrid', 'https://status.sendgrid.com', 'infra'],
 ];
 const BASE = process.env.WR1D_STATUS_BASE || ''; // dev only: point at local fixtures
 
@@ -53,8 +62,9 @@ module.exports = async (req, res) => {
   const t0 = Date.now();
   const out = await Promise.all(SERVICES.map(async s => {
     const src = BASE ? `${BASE}/${s[0]}.json` : `${s[2]}/api/v2/summary.json`;
-    try { return norm(s, await get(src, 5500)); }
-    catch (e) { return { id: s[0], name: s[1], url: s[2], cat: s[3], ok: false, error: String(e.name === 'AbortError' ? 'timeout' : e.message || e) }; }
+    const t = Date.now();
+    try { const r = norm(s, await get(src, 5500)); r.ms = Date.now() - t; r.host = new URL(s[2]).host; return r; }
+    catch (e) { return { id: s[0], name: s[1], url: s[2], cat: s[3], host: new URL(s[2]).host, ms: Date.now() - t, ok: false, error: String(e.name === 'AbortError' ? 'timeout' : e.message || e) }; }
   }));
   res.setHeader('content-type', 'application/json; charset=utf-8');
   res.setHeader('cache-control', 'public, max-age=20, s-maxage=60, stale-while-revalidate=120');
