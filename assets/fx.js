@@ -54,7 +54,7 @@
     const sv = S.data.services;
     // ticker of the live board
     const items = sv.slice().sort((a, b) => (lvOf(a) === 'none') - (lvOf(b) === 'none')).map(s => { const lv = lvOf(s); return `<span>${lv === 'none' ? '·' : '<b>!</b>'} ${esc(s.name)} <b>${esc(lv === 'none' ? 'ok' : lv === 'err' ? 'unreachable' : (s.description || lv).toLowerCase())}</b></span>`; }).join('');
-    $('#tk').innerHTML = items + items;
+    const tk = $('#tk'); if (tk) tk.innerHTML = items + items;
     // tiles: star, expand
     $$('#grid .svc').forEach(el => {
       const name = el.querySelector('h3').textContent, s = sv.find(x => x.name === name); if (!s) return;
