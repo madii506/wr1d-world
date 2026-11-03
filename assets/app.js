@@ -9,7 +9,7 @@
 
   /* ---------- intro: noise -> the world -> blackout -> the site. no words ---------- */
   const intro = $('#intro'); let introDone = false;
-  const hero = window.WGlobe($('#heroGlobe'), { font: 11, speed: 7, drag: true, scale: .9, lat: 16 });
+  const hero = window.WGlobe($('#heroGlobe'), { font: 10, speed: 7, drag: true, scale: .64, lat: 16 });
   function endIntro(fast) {
     if (introDone) return; introDone = true;
     intro.classList.remove('flick'); intro.classList.add('off');
@@ -20,7 +20,7 @@
   if (RM || sessionStorage.getItem('wr1d-seen')) { intro.classList.add('gone'); document.body.classList.remove('intro-on'); introDone = true; }
   else {
     try { sessionStorage.setItem('wr1d-seen', '1'); } catch (_) { }
-    ig = window.WGlobe($('#introGlobe'), { font: 10, speed: 22, scale: .78, lat: 16 }); ig.decode = 0; ig.rot = -60;
+    ig = window.WGlobe($('#introGlobe'), { font: 9, speed: 22, scale: .42, lat: 16 }); ig.decode = 0; ig.rot = -60;
     // falling characters behind the globe
     const rc = $('#introRain'), rx = rc.getContext('2d'); let cols = [], RW, RH;
     const rs = () => { const d = Math.min(2, devicePixelRatio || 1); RW = innerWidth; RH = innerHeight; rc.width = RW * d; rc.height = RH * d; rx.setTransform(d, 0, 0, d, 0, 0); rx.font = '500 12px JB, monospace'; cols = Array.from({ length: Math.ceil(RW / 14) }, () => ({ y: Math.random() * -RH, v: 60 + Math.random() * 220, l: 6 + Math.random() * 18 })); };
@@ -30,6 +30,7 @@
       if (rainStop) return; requestAnimationFrame(rain);
       const dt = Math.min(.05, (now - lt) / 1000); lt = now; const el = (now - t0) / 1000;
       rx.clearRect(0, 0, RW, RH);
+      if (el > .6 && el < 3.6) { const cx = RW / 2, cy = RH / 2, base = Math.min(RW, RH) * .21; for (let q = 0; q < 3; q++) { const ph = ((el - .6) * .55 + q / 3) % 1, rr = base * (1.05 + ph * 1.9), a = (1 - ph) * .5 * Math.min(1, (el - .6) * 2); const n = Math.floor(rr * .7); for (let s = 0; s < n; s++) { const th = s / n * Math.PI * 2; rx.fillStyle = `rgba(236,236,230,${(a * (.4 + .6 * ((s * 7) % 5) / 4)).toFixed(3)})`; rx.fillText(s % 9 === 0 ? '+' : '.', cx + Math.cos(th) * rr, cy + Math.sin(th) * rr * .92); } } }
       const fade = Math.max(0, 1 - Math.max(0, el - 1.6) / 1.4);
       if (fade <= 0) return;
       cols.forEach((c, i) => {
@@ -89,10 +90,8 @@
     // hero pulse + meter
     $('#pDot').classList.add('beat');
     $('#pTxt').textContent = issues.length ? `${issues.length} of ${n} services report a problem right now` : (errs.length === n ? 'no status page answered this minute' : `all ${ok.length} reachable services report operational`);
-    const cells = sv.map(s => ({ none: '#', minor: '=', maintenance: '~', major: '!', critical: 'X', err: '?' }[lvOf(s)])).join('');
-    $('#meter').innerHTML = `<span class="bar">[${esc(cells)}]</span>\n# ok  = degraded  ~ maintenance  ! outage  X critical  ? unreachable`;
     // grid
-    const rows = sv.filter(s => (S.c === 'all' || s.cat === S.c) && (S.f === 'all' || (S.f === 'issues' ? lvOf(s) !== 'none' : lvOf(s) === 'none')));
+    const qv = (document.getElementById('q') || {}).value || ''; const rows = sv.filter(s => (!qv || s.name.toLowerCase().includes(qv.toLowerCase())) && (S.c === 'all' || s.cat === S.c) && (S.f === 'all' || (S.f === 'issues' ? lvOf(s) !== 'none' : lvOf(s) === 'none')));
     const order = { critical: 0, major: 1, minor: 2, maintenance: 3, err: 4, none: 5 };
     rows.sort((a, b) => order[lvOf(a)] - order[lvOf(b)] || a.name.localeCompare(b.name));
     $('#grid').innerHTML = rows.length ? rows.map((s, i) => {
@@ -112,8 +111,9 @@
       <div><h3>${esc(x.name)}</h3>${x.update ? `<p>${esc(x.update)}</p>` : ''}<div class="tags"><span class="${/major|critical/.test(x.impact) ? 'hot' : ''}">impact: ${esc(x.impact || 'none')}</span><span>${esc(String(x.status || '').replace(/_/g, ' '))}</span><span>${esc(x.svc.cat)}</span></div></div>
       <div class="act"><button class="btn pri" data-kit="${i}">build kit</button><a href="${esc(x.link)}" target="_blank" rel="noopener">their post &nearr;</a></div></div>`).join('')
       : `<div class="empty"><pre>  .-""-.\n /  ok  \\\n \\      /\n  '-..-'</pre>no open incidents on the board right now. the world is holding. this list fills itself the minute a company posts one.</div>`;
-    S.inc = inc;
+    S.inc = inc; window.WR1D = S; document.dispatchEvent(new CustomEvent('wr1d:data', { detail: S }));
   }
+  window.WR1Dpaint = () => S.data && paint();
   $('#filters').addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     if (b.dataset.f) { S.f = b.dataset.f; $$('#filters [data-f]').forEach(x => x.classList.toggle('on', x === b)); }
