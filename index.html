@@ -10,7 +10,7 @@
 <meta property="og:image" content="/assets/og.png"><meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" sizes="64x64" href="/assets/fav-64.png?v=2"><link rel="icon" type="image/png" sizes="32x32" href="/assets/fav-32.png?v=2"><link rel="apple-touch-icon" href="/assets/fav-180.png?v=2">
 <link rel="preload" href="/assets/fonts/jetbrains-mono-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/app.css?v=2">
+<link rel="stylesheet" href="/assets/app.css?v=3">
 </head>
 <body class="intro-on">
 <div id="intro" aria-hidden="true"><canvas id="introGlobe"></canvas><canvas id="introRain"></canvas><i class="ibar"></i></div>
@@ -38,7 +38,8 @@
 
   <section class="band" id="status">
     <div class="sh"><span class="no">01</span><h2>the world, right now</h2><span class="live" id="liveTag"><i></i><em id="cd">--</em></span></div>
-    <p class="sub"><span>Eighteen public status pages, read straight from each company's own feed every minute.</span></p>
+    <p class="sub"><span>The internet runs on a few dozen companies. When one of them breaks, half the web breaks with it, and the timeline finds out within minutes. WR1D reads <b id="svcN">27</b> of their public status pages straight from each company's own feed, every minute, on the server. Clouds, CDNs, AI labs, chat apps, exchanges, a blockchain. Click any tile to open it, star it to watch it.</span></p>
+    <div class="scan" id="scan" aria-live="off"><div class="sh2"><span>scanner</span><span id="scanP">[..........................]</span><span id="scanN">0/0</span></div><pre id="scanLog"></pre></div>
     <div class="filters" id="filters"><label class="srch">&gt;<input id="q" placeholder="find a service" spellcheck="false"></label>
       <button class="on" data-f="all">all</button><button data-f="issues">issues</button><button data-f="ok">operational</button>
       <span class="sep"></span>
@@ -49,13 +50,13 @@
 
   <section class="band dim" id="down">
     <div class="sh"><span class="no">02</span><h2>down now &rarr; launch</h2><span class="count" id="downN"></span></div>
-    <p class="sub"><span>Every open incident on those pages, newest first. One click turns it into a coin kit.</span></p>
+    <p class="sub"><span>This is the part that moves. Every open incident on those pages lands here, newest first, in the company's own words with a link to their post. Degraded parts without an incident show up too. A narrative is only worth something in its first minutes, so one click turns any of them into a coin kit.</span></p>
     <div class="feed" id="feed"></div>
   </section>
 
   <section class="band" id="check">
     <div class="sh"><span class="no">03</span><h2>is it down?</h2></div>
-    <p class="sub"><span>Type any site. WR1D knocks on it from the server and tells you what it heard, and how fast.</span></p>
+    <p class="sub"><span>Not on the board? Type any site. WR1D knocks on it from the server, not from your browser, so your own connection is not the thing being tested. You get what it heard back: up or down, the HTTP status and how many milliseconds it took. If it's down, it becomes a kit.</span></p>
     <form class="ck" id="ck" autocomplete="off"><span class="pr">&gt;</span><input id="ckUrl" placeholder="x.com" spellcheck="false" aria-label="site to check"><button class="btn pri" id="ckGo" type="submit">knock <b>&rarr;</b></button></form>
     <pre class="ckOut" id="ckOut" aria-live="polite"></pre>
     <div class="ckB" id="ckB" hidden><button class="btn" id="ckKit" type="button">build kit from this</button></div>
@@ -63,13 +64,14 @@
 
   <section class="band" id="kit">
     <div class="sh"><span class="no">04</span><h2>the kit</h2></div>
-    <p class="sub"><span>Name, ticker, an ASCII image and the launch post. Download it, copy it, launch it on pump.fun.</span></p>
+    <p class="sub"><span>Everything a launch needs in one place. Name it, give it a ticker, drop in your own image or let WR1D draw one in ASCII, and write the post. Download the image, copy the post or the whole kit, then open pump.fun and launch it from your own wallet.</span></p>
     <div class="kit">
       <form class="kf" id="kf" autocomplete="off">
-        <label>name<input id="kName" maxlength="32" placeholder="GitHub is down"></label>
-        <label>ticker<input id="kTick" maxlength="10" placeholder="GHDOWN"></label>
-        <label>source<input id="kSrc" placeholder="https://www.githubstatus.com/incidents/…"></label>
-        <label>post<textarea id="kPost" rows="4"></textarea></label>
+        <label>name<input id="kName" maxlength="32" placeholder="name your coin"></label>
+        <label>ticker<input id="kTick" maxlength="10" placeholder="TICKER"></label>
+        <label>website<input id="kSrc" placeholder="the link that proves it, e.g. the status post"></label>
+        <label class="kimg">image<span class="kup"><input id="kFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><b id="kFileT">drop an image here or click to pick one</b></span><span class="kopt"><button type="button" class="chip on" data-im="ascii">ascii</button><button type="button" class="chip" data-im="photo">as is</button><button type="button" class="chip" id="kClear" hidden>remove</button></span></label>
+        <label>post<textarea id="kPost" rows="4" placeholder="the launch post"></textarea></label>
         <div class="kb">
           <button type="button" class="btn pri" id="kDl">download image</button>
           <button type="button" class="btn" id="kCopy">copy post</button>
@@ -107,7 +109,7 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="/assets/land.js?v=1"></script>
 <script src="/assets/globe.js?v=2"></script>
-<script src="/assets/app.js?v=2"></script>
-<script src="/assets/fx.js?v=2"></script>
+<script src="/assets/app.js?v=3"></script>
+<script src="/assets/fx.js?v=3"></script>
 </body>
 </html>
