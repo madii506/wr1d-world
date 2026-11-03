@@ -208,6 +208,11 @@
   ['kName', 'kTick'].forEach(id => $('#' + id).addEventListener('input', drawKit));
   $('#kDl').addEventListener('click', () => { drawKit(); const a = document.createElement('a'); a.download = ($('#kTick').value || 'wr1d').toLowerCase() + '.png'; a.href = kc.toDataURL('image/png'); a.click(); toast('image saved'); });
   $('#kCopy').addEventListener('click', () => copy($('#kPost').value, 'post copied'));
+  $('#kLaunch').addEventListener('click', () => {
+    drawKit(); const k = { name: $('#kName').value.trim(), ticker: $('#kTick').value.trim(), post: $('#kPost').value.trim(), site: $('#kSrc').value.trim() };
+    if (k.name || k.ticker || upImg) k.img = kc.toDataURL('image/png');
+    try { sessionStorage.setItem('wr1d-kit', JSON.stringify(k)); } catch (_) { } location.href = '/launch';
+  });
   $('#kAll').addEventListener('click', () => copy(`name: ${$('#kName').value}\nticker: ${$('#kTick').value}\nwebsite: ${$('#kSrc').value}\n\n${$('#kPost').value}`, 'kit copied'));
   document.fonts.ready.then(() => setTimeout(drawKit, 300));
 
