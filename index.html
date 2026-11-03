@@ -10,13 +10,13 @@
 <meta property="og:image" content="/assets/og.png"><meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" sizes="64x64" href="/assets/fav-64.png?v=2"><link rel="icon" type="image/png" sizes="32x32" href="/assets/fav-32.png?v=2"><link rel="apple-touch-icon" href="/assets/fav-180.png?v=2">
 <link rel="preload" href="/assets/fonts/jetbrains-mono-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/app.css?v=3">
+<link rel="stylesheet" href="/assets/app.css?v=4">
 </head>
 <body class="intro-on">
 <div id="intro" aria-hidden="true"><canvas id="introGlobe"></canvas><canvas id="introRain"></canvas><i class="ibar"></i></div>
 
 <header class="nav"><span></span>
-  <nav><a href="#status">status</a><a href="#down">down now</a><a href="#check">is it down?</a><a href="#kit">kit</a><a href="#how">how</a><a href="#faq">faq</a></nav>
+  <nav><a href="#status">status</a><a href="#down">down now</a><a href="#check">is it down?</a><a href="#kit">kit</a><a href="#how">how</a><a href="/launch">launch</a></nav>
   <span class="nr"><button class="ca" id="ca" hidden type="button"><b>CA</b><code></code></button></span>
 </header>
 
@@ -31,7 +31,7 @@
 |__/|__/_/ |_/_/_____/</pre>
       <p class="line">LAUNCH A HEDGE AGAINST THE WORLD.</p>
       <div class="pulse" id="pulse"><span class="dotl" id="pDot"></span><span id="pTxt">reading the world&hellip;</span></div>
-      <div class="cta"><a class="btn pri" href="#down">see what's down <b>&rarr;</b></a><a class="btn" href="#kit">make a kit</a></div>
+      <div class="cta"><a class="btn pri" href="#down">see what's down <b>&rarr;</b></a><a class="btn" href="#kit">make a kit</a><a class="btn" href="/launch">launch a coin</a></div>
     </div>
     <div class="hr"><canvas id="heroGlobe" aria-label="a rotating ascii globe, drag to spin"></canvas></div>
   </section>
@@ -76,9 +76,9 @@
           <button type="button" class="btn pri" id="kDl">download image</button>
           <button type="button" class="btn" id="kCopy">copy post</button>
           <button type="button" class="btn" id="kAll">copy kit</button><button type="button" class="btn" id="kMode">invert</button>
-          <a class="btn" id="kGo" href="https://pump.fun/create" target="_blank" rel="noopener">open pump.fun &nearr;</a>
+          <button type="button" class="btn pri" id="kLaunch">launch it here &rarr;</button>
         </div>
-        <p class="kn">pump.fun opens in a new tab. You paste the kit and sign the launch in your own wallet. WR1D never touches funds or keys.</p>
+        <p class="kn">"launch it here" carries the whole kit, image included, to the launch page, where you sign it in your own wallet. WR1D never touches funds or keys.</p>
       </form>
       <div class="kp"><canvas id="kCanvas" width="1000" height="1000"></canvas></div>
     </div>
@@ -102,14 +102,14 @@
     <div class="faq">
       <details><summary>where does the data come from?</summary><p>From each company's own public status page (their Statuspage JSON feed), read on the server every minute. A page that does not answer is shown as unreachable, never as fine.</p></details>
       <details><summary>is WR1D part of any of these companies?</summary><p>No. WR1D is independent and not affiliated with any company on the board. Names are used only to say whose status page is being read.</p></details>
-      <details><summary>does WR1D launch the coin for me?</summary><p>No. It builds the kit. You open pump.fun, paste it and sign in your own wallet. WR1D never holds funds or keys.</p></details>
+      <details><summary>does WR1D launch the coin for me?</summary><p>You launch it. The launch page sends your image and details to pump.fun's own IPFS, PumpPortal's public API builds the transaction for your wallet, you sign it, and WR1D only forwards the signed bytes to Solana. It never holds funds or keys.</p></details>
     </div>
   </section>
 </main>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="/assets/land.js?v=1"></script>
 <script src="/assets/globe.js?v=2"></script>
-<script src="/assets/app.js?v=3"></script>
+<script src="/assets/app.js?v=4"></script>
 <script src="/assets/fx.js?v=3"></script>
 </body>
 </html>

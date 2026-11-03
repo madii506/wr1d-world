@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>WR1D · launch</title>
+<meta name="description" content="Launch a coin on pump.fun from your own wallet, in one page.">
+<meta name="theme-color" content="#000000">
+<meta property="og:image" content="/assets/og.png"><meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="64x64" href="/assets/fav-64.png?v=2"><link rel="apple-touch-icon" href="/assets/fav-180.png?v=2">
+<link rel="stylesheet" href="/assets/app.css?v=4">
+</head>
+<body class="lp">
+<header class="nav"><a class="home" href="/">WR1D</a>
+  <nav><a href="/#status">status</a><a href="/#down">down now</a><a href="/#check">is it down?</a><a href="/#kit">kit</a><a class="on" href="/launch">launch</a></nav>
+  <span class="nr"><button class="btn wbtn" id="wBtn" type="button"><i class="wd"></i><span>connect wallet</span></button></span>
+</header>
+<main>
+  <section class="band lhero">
+    <div class="sh"><span class="no">&gt;</span><h2>launch</h2><span class="live"><i></i><em id="netTag">solana mainnet</em></span></div>
+    <p class="sub"><span>Put the coin on pump.fun without leaving this page. Your image and details go to pump.fun's own IPFS, the transaction is built for your wallet, you sign it, and WR1D only forwards the signed bytes to Solana. It never sees a key and never holds a lamport. A launch costs about 0.02 SOL plus whatever you choose to buy first.</span></p>
+    <div class="kit lkit">
+      <form class="kf" id="lf" autocomplete="off">
+        <label>name<input id="lName" maxlength="32" placeholder="name your coin" required></label>
+        <label>ticker<input id="lTick" maxlength="10" placeholder="TICKER" required></label>
+        <label>description<textarea id="lDesc" rows="3" maxlength="600" placeholder="what it is, in a line or two"></textarea></label>
+        <div class="row3">
+          <label>website<input id="lWeb" placeholder="https://"></label>
+          <label>x<input id="lX" placeholder="https://x.com/…"></label>
+          <label>telegram<input id="lTg" placeholder="https://t.me/…"></label>
+        </div>
+        <label class="kimg">image<span class="kup"><input id="lFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><b id="lFileT">drop an image here or click to pick one</b></span><span class="kopt"><button type="button" class="chip" data-im="ascii">ascii</button><button type="button" class="chip on" data-im="photo">as is</button><button type="button" class="chip" id="lClear" hidden>remove</button></span></label>
+        <label>first buy (SOL)<span class="buy"><input id="lBuy" type="number" min="0" max="10" step="0.01" value="0"><span class="chips"><button type="button" class="chip" data-b="0">0</button><button type="button" class="chip" data-b="0.1">0.1</button><button type="button" class="chip" data-b="0.5">0.5</button><button type="button" class="chip" data-b="1">1</button></span></span></label>
+        <button type="submit" class="btn pri big" id="lGo">connect a wallet to launch</button>
+        <p class="kn">The transaction is built by PumpPortal's public local-transaction API, which takes its own small fee on the first buy. Check every detail before you sign. Memecoins are extremely risky.</p>
+      </form>
+      <div>
+        <div class="kp"><canvas id="lCanvas" width="1000" height="1000"></canvas></div>
+        <pre class="term" id="lLog" aria-live="polite">&gt; waiting for a coin_</pre>
+        <div class="done" id="lDone" hidden></div>
+      </div>
+    </div>
+  </section>
+</main>
+<div class="wmenu" id="wMenu" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="/assets/land.js?v=1"></script>
+<script src="/assets/globe.js?v=2"></script>
+<script src="/assets/web3.min.js?v=1"></script>
+<script src="/assets/launch.js?v=1"></script>
+</body>
+</html>
