@@ -63,6 +63,26 @@
   const navIo = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) $$('.nav nav a').forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id)); }), { rootMargin: '-45% 0px -50% 0px' });
   secs.forEach(s => navIo.observe(s));
 
+  /* ---------- the scanner: this minute's reads, replayed one by one ---------- */
+  const scan = { q: [], i: 0, lines: [], data: null, t: 0 };
+  function scanFeed(d) { scan.data = d; if (!scan.t) scanTick(); }
+  function scanTick() {
+    const d = scan.data; if (!d) return; const sv = d.services;
+    if (scan.i >= sv.length) { scan.i = 0; scan.lines.push(`<b>— read complete · ${sv.filter(s => s.ok).length}/${sv.length} answered · ${d.ms} ms total · ${new Date(d.at).toISOString().slice(11, 19)} UTC —</b>`); }
+    else {
+      const s = sv[scan.i++], lv = !s.ok ? 'err' : (s.indicator === 'none' && s.maintenance ? 'maintenance' : s.indicator);
+      const tag = { none: 'operational', minor: '<i>DEGRADED</i>', major: '<i>MAJOR OUTAGE</i>', critical: '<i>CRITICAL</i>', maintenance: 'maintenance', err: '<i>NO ANSWER</i>' }[lv] || lv;
+      const host = (s.host || '').padEnd(34).slice(0, 34), ms = String(s.ms == null ? '—' : s.ms + 'ms').padStart(7);
+      scan.lines.push(`${new Date().toISOString().slice(11, 19)}  GET ${esc(host)} ${s.ok ? '200' : '---'} ${ms}  ${tag}${s.incidents && s.incidents.length ? ' · ' + s.incidents.length + ' open' : ''}`);
+    }
+    if (scan.lines.length > 8) scan.lines.shift();
+    const lg = document.getElementById('scanLog'); if (lg) lg.innerHTML = scan.lines.join('\n');
+    const n = sv.length, k = scan.i, w = 26, f = Math.round(k / n * w);
+    const p = document.getElementById('scanP'); if (p) p.textContent = '[' + '#'.repeat(f) + '.'.repeat(w - f) + ']';
+    const c = document.getElementById('scanN'); if (c) c.textContent = k + '/' + n;
+    scan.t = setTimeout(scanTick, document.hidden ? 2000 : 420 + Math.random() * 260);
+  }
+
   /* ---------- the live board ---------- */
   const LV = { none: 'operational', minor: 'degraded', major: 'major outage', critical: 'critical', maintenance: 'maintenance', err: 'unreachable' };
   const S = { data: null, f: 'all', c: 'all', next: 0, hist: {} };
@@ -85,7 +105,7 @@
   setInterval(() => { const s = Math.max(0, Math.round((S.next - Date.now()) / 1000)); $('#cd').textContent = S.next ? 'next read ' + s + 's' : '--'; if (S.next && Date.now() >= S.next) { S.next = Date.now() + 60000; load(); } }, 1000);
 
   function paint() {
-    const sv = S.data.services, n = sv.length;
+    const sv = S.data.services, n = sv.length; const sn = document.getElementById('svcN'); if (sn) sn.textContent = n; scanFeed(S.data);
     const issues = sv.filter(s => s.ok && lvOf(s) !== 'none'), errs = sv.filter(s => !s.ok), ok = sv.filter(s => s.ok && lvOf(s) === 'none');
     // hero pulse + meter
     $('#pDot').classList.add('beat');
@@ -143,21 +163,48 @@
   }
   const kitGlobe = document.createElement('canvas'); kitGlobe.style.cssText = 'position:fixed;left:-9999px;top:0;width:420px;height:420px'; document.body.appendChild(kitGlobe);
   const kg = window.WGlobe(kitGlobe, { font: 9, speed: 0, scale: .96, lat: 16 }); kg.rot = 10;
+  let upImg = null, imMode = 'ascii';
+  function asciiImage(img, cols) {           // any picture -> characters
+    const c = document.createElement('canvas'), x = c.getContext('2d'), cw = 6, chh = 11, rows = Math.round(cols * cw / chh);
+    c.width = cols; c.height = rows; const s = Math.min(img.width, img.height);
+    x.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, cols, rows);
+    const d = x.getImageData(0, 0, cols, rows).data, ramp = ' .:-=+*#%@', out = [];
+    for (let r = 0; r < rows; r++) { let l = ''; for (let q = 0; q < cols; q++) { const k = (r * cols + q) * 4, v = (d[k] * .3 + d[k + 1] * .59 + d[k + 2] * .11) / 255; l += ramp[Math.min(ramp.length - 1, Math.floor(v * ramp.length))]; } out.push(l); }
+    return out;
+  }
   function drawKit() {
-    const tick = ($('#kTick').value || 'GHDOWN').toUpperCase().replace(/[^A-Z0-9$]/g, '').slice(0, 10) || 'WR1D';
-    const name = $('#kName').value || 'GitHub is down';
-    kx.fillStyle = '#000'; kx.fillRect(0, 0, 1000, 1000);
-    // faint globe behind
+    const tick = ($('#kTick').value || '').toUpperCase().replace(/[^A-Z0-9$]/g, '').slice(0, 10);
+    const name = $('#kName').value.trim();
+    kx.fillStyle = '#000'; kx.fillRect(0, 0, 1000, 1000); kx.textBaseline = 'top';
+    if (upImg && imMode === 'photo') { const s = Math.min(upImg.width, upImg.height); kx.drawImage(upImg, (upImg.width - s) / 2, (upImg.height - s) / 2, s, s, 0, 0, 1000, 1000); return; }
+    if (upImg) { const L = asciiImage(upImg, 166); kx.font = '500 10px JB, monospace'; kx.fillStyle = '#ecece6'; const lw = kx.measureText('0').width, lh = 1000 / L.length; L.forEach((l, i) => kx.fillText(l, (1000 - l.length * lw) / 2, i * lh)); return; }
+    if (!tick && !name) {                    // empty state: a frame waiting for a coin
+      kx.globalAlpha = .22; kx.drawImage(kitGlobe, 290, 230, 420, 420); kx.globalAlpha = 1;
+      kx.strokeStyle = '#2a2a28'; kx.setLineDash([6, 8]); kx.strokeRect(60, 60, 880, 880); kx.setLineDash([]);
+      kx.font = '500 20px JB, monospace'; kx.fillStyle = '#6a6a66'; kx.textAlign = 'center';
+      kx.fillText('type a ticker, or drop an image', 500, 720); kx.textAlign = 'left'; return;
+    }
     kx.globalAlpha = .28; kx.drawImage(kitGlobe, 290, 120, 420, 420); kx.globalAlpha = 1;
-    const lines = asciiWord(tick, 150); kx.font = '500 10px JB, monospace'; kx.textBaseline = 'top'; kx.fillStyle = '#ecece6';
+    const lines = asciiWord(tick || name.toUpperCase().slice(0, 10), 150); kx.font = '500 10px JB, monospace'; kx.fillStyle = '#ecece6';
     const lw = kx.measureText('0').width, y0 = 560 - lines.length * 6;
     lines.forEach((l, i) => kx.fillText(l, (1000 - l.length * lw) / 2, y0 + i * 12));
-    kx.font = '500 26px JB, monospace'; kx.fillStyle = '#cfcfc9'; kx.textAlign = 'center';
-    kx.fillText(name.toUpperCase(), 500, y0 + lines.length * 12 + 40); kx.textAlign = 'left';
+    if (name) { kx.font = '500 26px JB, monospace'; kx.fillStyle = '#cfcfc9'; kx.textAlign = 'center'; kx.fillText(name.toUpperCase(), 500, y0 + lines.length * 12 + 40); kx.textAlign = 'left'; }
     kx.font = '500 15px JB, monospace'; kx.fillStyle = '#5a5a57'; kx.fillText('[ ' + new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC ]', 40, 950);
-    const tw = kx.measureText('WR1D').width; kx.fillText('WR1D', 960 - tw, 950);
-    if (!$('#kPost').value) $('#kPost').value = `${name}.\n\n$${tick}`;
   }
+  const kFile = $('#kFile'), kup = kFile.parentElement;
+  function useFile(f) {
+    if (!f || !/^image\//.test(f.type)) return toast('that is not an image');
+    if (f.size > 4e6) return toast('keep it under 4 MB');
+    const url = URL.createObjectURL(f), im = new Image();
+    im.onload = () => { upImg = im; $('#kFileT').textContent = f.name; $('#kClear').hidden = false; drawKit(); };
+    im.src = url;
+  }
+  kFile.addEventListener('change', () => useFile(kFile.files[0]));
+  ['dragenter', 'dragover'].forEach(e => kup.addEventListener(e, ev => { ev.preventDefault(); kup.classList.add('drag'); }));
+  ['dragleave', 'drop'].forEach(e => kup.addEventListener(e, () => kup.classList.remove('drag')));
+  kup.addEventListener('drop', ev => { ev.preventDefault(); useFile(ev.dataTransfer.files[0]); });
+  $$('.kopt [data-im]').forEach(b => b.addEventListener('click', () => { imMode = b.dataset.im; $$('.kopt [data-im]').forEach(x => x.classList.toggle('on', x === b)); drawKit(); }));
+  $('#kClear').addEventListener('click', () => { upImg = null; kFile.value = ''; $('#kFileT').textContent = 'drop an image here or click to pick one'; $('#kClear').hidden = true; drawKit(); });
   ['kName', 'kTick'].forEach(id => $('#' + id).addEventListener('input', drawKit));
   $('#kDl').addEventListener('click', () => { drawKit(); const a = document.createElement('a'); a.download = ($('#kTick').value || 'wr1d').toLowerCase() + '.png'; a.href = kc.toDataURL('image/png'); a.click(); toast('image saved'); });
   $('#kCopy').addEventListener('click', () => copy($('#kPost').value, 'post copied'));
