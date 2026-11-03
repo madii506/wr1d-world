@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>WR1D</title>
+<meta name="description" content="Every outage is a launch. The world's status pages, live, and a coin kit for whatever just went down.">
+<meta name="theme-color" content="#000000">
+<meta property="og:title" content="WR1D"><meta property="og:description" content="Launch a hedge against the world.">
+<meta property="og:image" content="/assets/og.png"><meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/assets/fav-64.png">
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/app.css?v=1">
+</head>
+<body class="intro-on">
+<div id="intro" aria-hidden="true"><canvas id="introGlobe"></canvas><canvas id="introRain"></canvas><i class="ibar"></i></div>
+
+<header class="nav"><span></span>
+  <nav><a href="#status">status</a><a href="#down">down now</a><a href="#check">is it down?</a><a href="#kit">kit</a><a href="#how">how</a><a href="#faq">faq</a></nav>
+  <span class="nr"><button class="ca" id="ca" hidden type="button"><b>CA</b><code></code></button></span>
+</header>
+
+<main>
+  <section class="hero" id="top">
+    <div class="hl">
+      <pre class="mark" aria-label="WR1D"> _       ______ _______
+| |     / / __ &lt;  / __ \
+| | /| / / /_/ / / / / /
+| |/ |/ / _, _/ / /_/ /
+|__/|__/_/ |_/_/_____/</pre>
+      <p class="line">LAUNCH A HEDGE AGAINST THE WORLD.</p>
+      <div class="pulse" id="pulse"><span class="dotl" id="pDot"></span><span id="pTxt">reading the world&hellip;</span></div>
+      <div class="cta"><a class="btn pri" href="#down">see what's down <b>&rarr;</b></a><a class="btn" href="#kit">make a kit</a></div>
+      <div class="meter" id="meter" aria-label="world health"></div>
+    </div>
+    <div class="hr"><canvas id="heroGlobe" aria-label="a rotating ascii globe, drag to spin"></canvas></div>
+  </section>
+
+  <section class="band" id="status">
+    <div class="sh"><span class="no">01</span><h2>the world, right now</h2><span class="live" id="liveTag"><i></i><em id="cd">--</em></span></div>
+    <p class="sub"><span>Eighteen public status pages, read straight from each company's own feed every minute.</span></p>
+    <div class="filters" id="filters">
+      <button class="on" data-f="all">all</button><button data-f="issues">issues</button><button data-f="ok">operational</button>
+      <span class="sep"></span>
+      <button data-c="all" class="on">every kind</button><button data-c="infra">infra</button><button data-c="ai">ai</button><button data-c="dev">dev</button><button data-c="social">social</button><button data-c="crypto">crypto</button><button data-c="cloud">cloud</button><button data-c="games">games</button>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="band dim" id="down">
+    <div class="sh"><span class="no">02</span><h2>down now &rarr; launch</h2><span class="count" id="downN"></span></div>
+    <p class="sub"><span>Every open incident on those pages, newest first. One click turns it into a coin kit.</span></p>
+    <div class="feed" id="feed"></div>
+  </section>
+
+  <section class="band" id="check">
+    <div class="sh"><span class="no">03</span><h2>is it down?</h2></div>
+    <p class="sub"><span>Type any site. WR1D knocks on it from the server and tells you what it heard, and how fast.</span></p>
+    <form class="ck" id="ck" autocomplete="off"><span class="pr">&gt;</span><input id="ckUrl" placeholder="x.com" spellcheck="false" aria-label="site to check"><button class="btn pri" id="ckGo" type="submit">knock <b>&rarr;</b></button></form>
+    <pre class="ckOut" id="ckOut" aria-live="polite"></pre>
+    <div class="ckB" id="ckB" hidden><button class="btn" id="ckKit" type="button">build kit from this</button></div>
+  </section>
+
+  <section class="band" id="kit">
+    <div class="sh"><span class="no">04</span><h2>the kit</h2></div>
+    <p class="sub"><span>Name, ticker, an ASCII image and the launch post. Download it, copy it, launch it on pump.fun.</span></p>
+    <div class="kit">
+      <form class="kf" id="kf" autocomplete="off">
+        <label>name<input id="kName" maxlength="32" placeholder="GitHub is down"></label>
+        <label>ticker<input id="kTick" maxlength="10" placeholder="GHDOWN"></label>
+        <label>source<input id="kSrc" placeholder="https://www.githubstatus.com/incidents/…"></label>
+        <label>post<textarea id="kPost" rows="4"></textarea></label>
+        <div class="kb">
+          <button type="button" class="btn pri" id="kDl">download image</button>
+          <button type="button" class="btn" id="kCopy">copy post</button>
+          <button type="button" class="btn" id="kAll">copy kit</button>
+          <a class="btn" id="kGo" href="https://pump.fun/create" target="_blank" rel="noopener">open pump.fun &nearr;</a>
+        </div>
+        <p class="kn">pump.fun opens in a new tab. You paste the kit and sign the launch in your own wallet. WR1D never touches funds or keys.</p>
+      </form>
+      <div class="kp"><canvas id="kCanvas" width="1000" height="1000"></canvas></div>
+    </div>
+  </section>
+
+  <section class="band dim" id="how">
+    <div class="sh"><span class="no">05</span><h2>how it works</h2></div>
+    <div class="steps">
+      <div class="st"><pre>[ status pages ]
+      |
+      v</pre><h3>1. read</h3><p>Every minute WR1D reads the public status feeds of the services the internet runs on.</p></div>
+      <div class="st"><pre>[ incident ]
+      |
+      v</pre><h3>2. catch</h3><p>A new incident shows up in the feed the moment the company posts it, with its own words and link.</p></div>
+      <div class="st"><pre>[ kit ] --&gt; pump.fun</pre><h3>3. launch</h3><p>One click builds the name, ticker, ASCII image and post. You launch it from your own wallet.</p></div>
+    </div>
+  </section>
+
+  <section class="band" id="faq">
+    <div class="sh"><span class="no">06</span><h2>faq</h2></div>
+    <div class="faq">
+      <details><summary>where does the data come from?</summary><p>From each company's own public status page (their Statuspage JSON feed), read on the server every minute. A page that does not answer is shown as unreachable, never as fine.</p></details>
+      <details><summary>is WR1D part of any of these companies?</summary><p>No. WR1D is independent and not affiliated with any company on the board. Names are used only to say whose status page is being read.</p></details>
+      <details><summary>does WR1D launch the coin for me?</summary><p>No. It builds the kit. You open pump.fun, paste it and sign in your own wallet. WR1D never holds funds or keys.</p></details>
+      <details><summary>why ASCII?</summary><p>Because when everything else is down, text still loads.</p></details>
+      <details><summary>is this advice?</summary><p>No. Memecoins are extremely risky and most go to zero. Nothing here is financial advice.</p></details>
+    </div>
+  </section>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="/assets/land.js?v=1"></script>
+<script src="/assets/globe.js?v=1"></script>
+<script src="/assets/app.js?v=1"></script>
+</body>
+</html>

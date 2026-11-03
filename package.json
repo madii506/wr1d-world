@@ -1,0 +1,7 @@
+{
+  "name": "wr1d",
+  "private": true,
+  "version": "1.0.0",
+  "description": "WR1D: every outage is a launch.",
+  "engines": { "node": "22.x" }
+}
